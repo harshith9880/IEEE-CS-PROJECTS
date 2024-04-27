@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Music Player</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Python Music Player</h1>
+        <div id="songInfo" class="mt-3">
+            <strong>{{ current_song.title }}</strong> - {{ current_song.author }}
+        </div>
+        <div class="mt-3">
+            <button id="playPauseBtn" class="btn btn-primary">{{ 'Pause' if is_playing else 'Play' }}</button>
+            <button id="nextBtn" class="btn btn-secondary">Next</button>
+            <button id="prevBtn" class="btn btn-secondary">Prev</button>
+            <button id="increaseVolumeBtn" class="btn btn-success">+</button>
+            <button id="decreaseVolumeBtn" class="btn btn-danger">-</button>
+        </div>
+        <div id="recentlyPlayed" class="mt-5">
+            <h3>Recently Played:</h3>
+            <ul>
+                {% for song in recently_played %}
+                <li>{{ song.title }} - {{ song.author }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="lyrics" class="mt-5">
+            <h3>Lyrics:</h3>
+            <pre>{{ current_song.lyrics }}</pre>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#playPauseBtn').click(function() {
+                $.post('/play_pause', function(data) {
+                    $('#playPauseBtn').text(data.is_playing ? 'Pause' : 'Play');
+                });
+            });
+
+            $('#nextBtn').click(function() {
+                $.post('/next_song', function(data) {
+                    $('#songInfo').html('<strong>' + data.current_song.title + '</strong> - ' + data.current_song.author);
+                    $('#playPauseBtn').text(data.is_playing ? 'Pause' : 'Play');
+                    $('#lyrics pre').text(data.current_song.lyrics);
+                });
+            });
+
+            $('#prevBtn').click(function() {
+                $.post('/prev_song', function(data) {
+                    $('#songInfo').html('<strong>' + data.current_song.title + '</strong> - ' + data.current_song.author);
+                    $('#playPauseBtn').text(data.is_playing ? 'Pause' : 'Play');
+                    $('#lyrics pre').text(data.current_song.lyrics);
+                });
+            });
+
+            $('#increaseVolumeBtn').click(function() {
+                $.post('/increase_volume', function(data) {
+                    console.log('Volume increased:', data.volume);
+                });
+            });
+
+            $('#decreaseVolumeBtn').click(function() {
+                $.post('/decrease_volume', function(data) {
+                    console.log('Volume decreased:', data.volume);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
